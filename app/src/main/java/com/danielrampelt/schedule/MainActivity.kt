@@ -38,7 +38,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -88,23 +90,80 @@ class MainActivity : ComponentActivity() {
             WeekScheduleTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(color = MaterialTheme.colors.background) {
-                    var date by remember { mutableStateOf(LocalDate.of(2025, 1, 13)) }
-                    var events = sampleEvents.filter { !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) }
-                    Schedule(
-                        events = events,
-                        minTime = LocalTime.of(1, 0),
-                        maxTime = LocalTime.of(22, 0),
-                        daySize = ScheduleSize.Adaptive(
-                            minSize = 0.dp
-                        ),
-                        numDays = 1,
-                        date = date,
-                    )
+//                    var date by remember { mutableStateOf(LocalDate.of(2025, 1, 13)) }
+//                    var events = sampleEvents.filter { !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) }
+//                    Schedule(
+//                        events = events,
+//                        minTime = LocalTime.of(1, 0),
+//                        maxTime = LocalTime.of(22, 0),
+//                        daySize = ScheduleSize.Adaptive(
+//                            minSize = 0.dp
+//                        ),
+//                        numDays = 1,
+//                        date = date,
+//                    )
+
+                    CalendarScreen()
                 }
             }
         }
     }
 }
+
+
+
+@Composable
+fun CalendarScreen() {
+    var currentDate by remember { mutableStateOf(LocalDate.now()) }
+    val dateFormatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy") // Format the date
+//    var date by remember { mutableStateOf(LocalDate.of(2025, 1, 13)) }
+    var events = sampleEvents.filter { !it.start.toLocalDate().isAfter(currentDate) && !it.end.toLocalDate().isBefore(currentDate) }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = { currentDate = currentDate.minusDays(1) }) {
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Previous Day")
+            }
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = currentDate.format(dateFormatter),
+                style = MaterialTheme.typography.h6
+            )
+            Spacer(Modifier.width(8.dp))
+            IconButton(onClick = { currentDate = currentDate.plusDays(1) }) {
+                Icon(Icons.Filled.ArrowForward, contentDescription = "Next Day")
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Schedule(
+            events = events,
+            minTime = LocalTime.of(1, 0),
+            maxTime = LocalTime.of(22, 0),
+            daySize = ScheduleSize.Adaptive(
+                minSize = 0.dp
+            ),
+            numDays = 1,
+            date = currentDate,
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    CalendarScreen()
+}
+
+
 
 data class Event(
     val name: String,
@@ -732,7 +791,7 @@ fun BasicSchedule(
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(60000) // 1 minute
+            delay(15000) // refresh clock every 15 seconds
             currentTime = LocalTime.now()
         }
     }
