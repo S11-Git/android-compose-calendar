@@ -900,7 +900,7 @@ fun BasicSchedule(
                 }
             }
     ) { measureables, constraints ->
-        val height = with(density) { (hourHeight.toPx() * (numHours + 1)).roundToInt() } + 16.dp.roundToPx() // Adjusted to include the last hour and extra space
+        val height = with(density) { (hourHeight.toPx() * (numHours)).roundToInt() - 16.dp.toPx()}  // Adjusted the height to make sure it doesnt go too far
         val width = with(density) { dayWidth.roundToPx() * numDays }
         Log.d("BasicSchedule", "Layout size: width=$width, height=$height")
         val placeablesWithEvents = measureables.map { measurable ->
@@ -912,7 +912,7 @@ fun BasicSchedule(
             Log.d("BasicSchedule", "Measured event: ${splitEvent.event.name}, width=$eventWidth, height=$eventHeight")
             Pair(placeable, splitEvent)
         }
-        layout(width, height) {
+        layout(width, height.toInt()) {
             placeablesWithEvents.forEach { (placeable, splitEvent) ->
                 val eventOffsetMinutes = if (splitEvent.start > minTime) ChronoUnit.MINUTES.between(minTime, splitEvent.start) else 0
                 val eventY = with(density) { ((eventOffsetMinutes / 60f) * hourHeight.toPx()).roundToInt() }
