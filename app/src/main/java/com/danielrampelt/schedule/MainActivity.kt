@@ -9,9 +9,12 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,9 +31,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -38,15 +47,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,7 +69,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -72,7 +83,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.danielrampelt.schedule.ui.theme.WeekScheduleTheme
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -87,9 +100,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            WeekScheduleTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(color = MaterialTheme.colors.background) {
+            WeekScheduleTheme{
+                val deviceWidthDp = LocalConfiguration.current.screenWidthDp.dp
+                Box() {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        CalView(deviceWidthDp)
+                    }
+                }
+            }
+//            WeekScheduleTheme {
+//                // A surface container using the 'background' color from the theme
+//                Surface(color = MaterialTheme.colors.background) {
 //                    var date by remember { mutableStateOf(LocalDate.of(2025, 1, 13)) }
 //                    var events = sampleEvents.filter { !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) }
 //                    Schedule(
@@ -102,47 +125,32 @@ class MainActivity : ComponentActivity() {
 //                        numDays = 1,
 //                        date = date,
 //                    )
-
-                    CalendarScreen()
-                }
-            }
+//
+//
+//                    DayViewLazyRow()
+//                }
+//            }
         }
     }
 }
 
-
-
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CalendarScreen() {
-    var currentDate by remember { mutableStateOf(LocalDate.now()) }
-    val dateFormatter = DateTimeFormatter.ofPattern("EEEE, dd MMMM yyyy") // Format the date
-//    var date by remember { mutableStateOf(LocalDate.of(2025, 1, 13)) }
-    var events = sampleEvents.filter { !it.start.toLocalDate().isAfter(currentDate) && !it.end.toLocalDate().isBefore(currentDate) }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { currentDate = currentDate.minusDays(1) }) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Previous Day")
-            }
-            Spacer(Modifier.width(8.dp))
-            Text(
-                text = currentDate.format(dateFormatter),
-                style = MaterialTheme.typography.h6
-            )
-            Spacer(Modifier.width(8.dp))
-            IconButton(onClick = { currentDate = currentDate.plusDays(1) }) {
-                Icon(Icons.Filled.ArrowForward, contentDescription = "Next Day")
-            }
-        }
+fun CalView(deviceWidthDp: Dp) {
+    val currentDate = LocalDate.now()
 
-        Spacer(Modifier.height(16.dp))
+    val initialPage = 90 // the page which will be shown as the current date
+    val pageCount = 100 // total amount of pages generated by the pager
 
+    val pagerState = rememberPagerState(
+        initialPage = initialPage,
+        pageCount = { pageCount }
+    )
+
+    HorizontalPager(state = pagerState) { page ->
+        val date = currentDate.plusDays((page - initialPage).toLong())
+        var events = sampleEvents.filter { !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) }
         Schedule(
             events = events,
             minTime = LocalTime.of(1, 0),
@@ -151,19 +159,11 @@ fun CalendarScreen() {
                 minSize = 0.dp
             ),
             numDays = 1,
-            date = currentDate,
+            date = date,
+            modifier = Modifier.width(deviceWidthDp)
         )
     }
 }
-
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    CalendarScreen()
-}
-
-
 
 data class Event(
     val name: String,
@@ -448,6 +448,7 @@ fun ScheduleHeader(
                     }
                 }
             }
+
 
             Column(modifier = modifier) {
                 // Day headers
