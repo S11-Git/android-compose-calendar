@@ -148,6 +148,8 @@ fun CalView(deviceWidthDp: Dp) {
         pageCount = { pageCount }
     )
 
+    val verticalScrollState = rememberScrollState()
+
     HorizontalPager(state = pagerState) { page ->
         val date = currentDate.plusDays((page - initialPage).toLong())
         var events = sampleEvents.filter { !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) }
@@ -160,7 +162,8 @@ fun CalView(deviceWidthDp: Dp) {
             ),
             numDays = 1,
             date = date,
-            modifier = Modifier.width(deviceWidthDp)
+            modifier = Modifier.width(deviceWidthDp),
+            verticalScrollState = verticalScrollState,
         )
     }
 }
@@ -690,12 +693,13 @@ fun Schedule(
     daySize: ScheduleSize = ScheduleSize.FixedSize(256.dp),
     hourSize: ScheduleSize = ScheduleSize.FixedSize(64.dp),
     date: LocalDate,
+    verticalScrollState: ScrollState,
 ) {
     val minDate = date
     val maxDate = date
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes.toFloat() / 60f
-    val verticalScrollState = rememberScrollState()
+
 //    val horizontalScrollState = rememberScrollState()
     var sidebarWidth by remember { mutableStateOf(0) }
     var headerHeight by remember { mutableStateOf(0) }
@@ -933,14 +937,14 @@ fun BasicSchedule(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun SchedulePreview() {
-    WeekScheduleTheme {
-        Schedule(
-            sampleEvents,
-            date = LocalDate.of(2024, 12, 8),
-        )
-    }
-}
+//@RequiresApi(Build.VERSION_CODES.O)
+//@Preview(showBackground = true)
+//@Composable
+//fun SchedulePreview() {
+//    WeekScheduleTheme {
+//        Schedule(
+//            sampleEvents,
+//            date = LocalDate.of(2024, 12, 8),
+//        )
+//    }
+//}
