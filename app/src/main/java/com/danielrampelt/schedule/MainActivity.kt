@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -91,8 +92,9 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppCompatDelegate.MODE_NIGHT_NO
         setContent {
-            WeekScheduleTheme{
+
                 val deviceWidthDp = LocalConfiguration.current.screenWidthDp.dp
                 CompositionLocalProvider(
                     LocalOverscrollConfiguration provides null
@@ -101,22 +103,23 @@ class MainActivity : ComponentActivity() {
                         Column(
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
+                            val events = generateRandomEvents(LocalDateTime.parse("2025-01-01T00:00:00"), LocalDateTime.parse("2025-01-31T23:59:59"))
+                            events.forEach { println(it) }
                             Schedule(
-                                eventList = sampleEvents,
-                                date = LocalDate.now(),
-                                numDays = 1,
+                                eventList = events,
+                                numDays = 3,
                                 minTime = LocalTime.of(2, 0),
                                 maxTime = LocalTime.of(23, 59),
                                 daySize = ScheduleSize.Adaptive(
                                     minSize = 0.dp
                                 ),
                                 modifier = Modifier.width(deviceWidthDp),
-                                verticalScrollState = rememberScrollState(),
+                                deviceWidth = deviceWidthDp
                             )
                         }
                     }
                 }
-            }
+
 //            WeekScheduleTheme {
 //                // A surface container using the 'background' color from the theme
 //                Surface(color = MaterialTheme.colors.background) {
@@ -269,7 +272,9 @@ fun BasicDayHeader(
     val dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH)
     val dayOfWeek = date.format(dayOfWeekFormatter).uppercase(Locale.ENGLISH)
     Column(
-        modifier = modifier.padding(top = 14.dp, bottom = 8.dp).fillMaxWidth(),
+        modifier = modifier
+            .padding(top = 14.dp, bottom = 8.dp)
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
@@ -323,7 +328,7 @@ fun ScheduleHeader(
     modifier: Modifier = Modifier,
     dayHeader: @Composable (date: LocalDate) -> Unit = { BasicDayHeader(date = it) },
     date: LocalDate,
-    ) {
+) {
 
     var enabled by remember { mutableStateOf(false) }
 
@@ -361,14 +366,14 @@ fun ScheduleHeader(
             Column(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.padding(start = 8.dp, end = 0.dp).fillMaxHeight()
+                modifier = Modifier.padding(start = 2.dp, end = 0.dp).fillMaxHeight()
             ) {
                 Text(
                     getCurrentWeekNumber(date = date).toString(),
                     fontSize = 55.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).width(65.dp),
+                    modifier = Modifier.align(Alignment.CenterHorizontally).width(1.dp),
                 )
                 if (allDayEvents.size > 2) {
                     IconButton(onClick = { enabled = !enabled }) {
@@ -474,9 +479,10 @@ fun BasicSidebarLabelPreview() {
 @Composable
 fun ScheduleSidebar(
     hourHeight: Dp,
+    composableWidth: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    minTime: LocalTime = LocalTime.of(0,1),
-    maxTime: LocalTime = LocalTime.of(23,59),
+    minTime: LocalTime = LocalTime.of(0, 1),
+    maxTime: LocalTime = LocalTime.of(23, 59),
     label: @Composable (time: LocalTime) -> Unit = { BasicSidebarLabel(time = it) },
 ) {
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
@@ -485,7 +491,12 @@ fun ScheduleSidebar(
     val firstHourOffsetMinutes = if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
     val firstHourOffset = hourHeight * (firstHourOffsetMinutes / 60f)
     val startTime = if (firstHour == minTime) firstHour else firstHour.plusHours(1)
-    Column(modifier = modifier) {
+
+    Column(
+        modifier = modifier.onGloballyPositioned { coordinates ->
+            composableWidth(coordinates.size.width)
+        }
+    ) {
         Spacer(modifier = Modifier.height(firstHourOffset))
         repeat(numHours) { i ->
             Box(modifier = Modifier.height(hourHeight)) {
@@ -501,7 +512,7 @@ fun ScheduleSidebar(
 fun ScheduleSidebarPreview() {
     WeekScheduleTheme {
         ScheduleSidebar(
-            hourHeight = 64.dp,
+            hourHeight = 64.dp, {}
         )
     }
 }
@@ -612,23 +623,23 @@ fun Schedule(
     eventContent: @Composable (positionedEvent: PositionedEvent) -> Unit = { BasicEvent(positionedEvent = it) },
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(date = it) },
     timeLabel: @Composable (time: LocalTime) -> Unit = { BasicSidebarLabel(time = it) },
-    numDays: Int = 1,
-    minTime: LocalTime = LocalTime.of(0,1),
-    maxTime: LocalTime = LocalTime.of(23,59),
+    numDays: Int = 3,
+    minTime: LocalTime = LocalTime.of(0, 1),
+    maxTime: LocalTime = LocalTime.of(23, 59),
     daySize: ScheduleSize = ScheduleSize.FixedSize(256.dp),
     hourSize: ScheduleSize = ScheduleSize.FixedSize(64.dp),
-    date: LocalDate,
-    verticalScrollState: ScrollState,
+    deviceWidth: Dp = 300.dp
 ) {
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes.toFloat() / 60f
 
-
-
-//    val horizontalScrollState = rememberScrollState()
     var sidebarWidth by remember { mutableIntStateOf(0) }
     var headerHeight by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
+
+    var screenWidthWithoutSideBar = deviceWidth - sidebarWidth.dp
+    var threeDayView = screenWidthWithoutSideBar / 3
+    var sevenDayView = screenWidthWithoutSideBar / 7
 
     val currentDate = LocalDate.now()
 
@@ -641,10 +652,6 @@ fun Schedule(
     )
 
     val verticalScrollState = rememberScrollState()
-
-    val deviceWidthDp = LocalConfiguration.current.screenWidthDp.dp
-
-
 
     BoxWithConstraints(
         modifier = modifier
@@ -660,18 +667,11 @@ fun Schedule(
             is ScheduleSize.Adaptive -> with(density) { maxOf(((constraints.maxHeight - headerHeight) / numHours).toDp(), hourSize.minSize) }
         }
 
-
-
-//        LaunchedEffect(Unit) {
-//            horizontalScrollState.scrollTo(0)
-//        }
-
         Column(modifier = modifier) {
             ScheduleHeader(
                 dayWidth = dayWidth,
                 events = eventList,
                 modifier = Modifier
-//                    .horizontalScroll(horizontalScrollState)
                     .onGloballyPositioned { headerHeight = it.size.height },
                 dayHeader = dayHeader,
                 date = currentDate.plusDays((pagerState.currentPage - initialPage).toLong()),
@@ -682,16 +682,16 @@ fun Schedule(
                 .align(Alignment.Start)) {
                 ScheduleSidebar(
                     hourHeight = hourHeight,
+                    composableWidth = { sidebarWidth = it },
                     minTime = minTime,
                     maxTime = maxTime,
                     label = timeLabel,
                     modifier = Modifier
                         .verticalScroll(verticalScrollState)
-                        .onGloballyPositioned { sidebarWidth = it.size.width }
                 )
-                HorizontalPager(state = pagerState) { page ->
+                HorizontalPager(state = pagerState, pageSize = PageSize.Fixed(deviceWidth / 3 - 14.dp)) { page ->
                     val date = currentDate.plusDays((page - initialPage).toLong())
-                    var events = eventList.filter { !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) }
+                    val events = eventList.filter { !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) }
                     val nonAllDayEvents = events.filterNot(Event::isAllDay)
 
                     BasicSchedule(
@@ -705,17 +705,13 @@ fun Schedule(
                         modifier = Modifier
                             .weight(1f)
                             .verticalScroll(verticalScrollState)
-//                        .horizontalScroll(horizontalScrollState)
                             .padding(top = 16.dp),
-                        //                    horizontalScrollState = horizontalScrollState,
                     )
                 }
-
             }
         }
     }
 }
-
 
 @Composable
 fun BasicSchedule(
@@ -735,7 +731,7 @@ fun BasicSchedule(
     val numDays = ChronoUnit.DAYS.between(date, date).toInt() + 1
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = (numMinutes / 60) + 1 // Ensure the last hour is included
-    val dividerColor = if (MaterialTheme.colors.isLight) Color.LightGray else Color.DarkGray
+    val dividerColor = Color.LightGray
     val positionedEvents = remember(events) { arrangeEvents(splitEvents(events.sortedBy(Event::start))).filter { it.end > minTime && it.start < maxTime } }
     var dummyEvent by remember { mutableStateOf<PositionedEvent?>(null) }
     val density = LocalDensity.current
@@ -758,7 +754,7 @@ fun BasicSchedule(
                     .clickable {
                         Log.d(
                             "BasicSchedule",
-                            "Event clicked: ${positionedEvent.event.name}"
+                            "Event clicked: ${positionedEvent.event.name}" + " at ${positionedEvent.start} - ${positionedEvent.end}" + " on ${positionedEvent.date}"
                         )
                     }) {
                     eventContent(positionedEvent)
@@ -782,7 +778,8 @@ fun BasicSchedule(
                         minTime,
                         firstHour.plusHours(1)
                     )
-                val firstHourOffset = with(density) { (firstHourOffsetMinutes / 60f) * hourHeight.toPx() }
+                val firstHourOffset =
+                    with(density) { (firstHourOffsetMinutes / 60f) * hourHeight.toPx() }
                 repeat(numHours) { // Adjusted to include the last hour
                     drawLine(
                         dividerColor,
@@ -821,7 +818,14 @@ fun BasicSchedule(
                             name = "Create new event",
                             color = Color.Gray,
                             start = LocalDateTime.of(clickedDate, nearestHour),
-                            end = LocalDateTime.of(clickedDate.plusDays(if (eventEnd.isBefore(nearestHour)) 1 else 0), eventEnd)
+                            end = LocalDateTime.of(
+                                clickedDate.plusDays(
+                                    if (eventEnd.isBefore(
+                                            nearestHour
+                                        )
+                                    ) 1 else 0
+                                ), eventEnd
+                            )
                         ),
                         splitType = SplitType.None,
                         date = clickedDate,
@@ -849,7 +853,10 @@ fun BasicSchedule(
                     drawCircle(
                         color = Color.Black,
                         radius = with(density) { 4.dp.toPx() },
-                        center = Offset(with(density) { 4.dp.toPx() }, currentTimeOffset) // Adjusted offset
+                        center = Offset(
+                            with(density) { 4.dp.toPx() },
+                            currentTimeOffset
+                        ) // Adjusted offset
                     )
                 }
             }

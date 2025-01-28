@@ -3,6 +3,7 @@ package com.danielrampelt.schedule
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import java.time.LocalDateTime
+import kotlin.random.Random
 
 val sampleEvents = listOf(
     Event(
@@ -247,6 +248,64 @@ val sampleEvents = listOf(
     )
 
 )
+
+// Function to generate random events
+fun generateRandomEvents(startDate: LocalDateTime, endDate: LocalDateTime): List<Event> {
+    val events = mutableListOf<Event>()
+    val random = Random(System.currentTimeMillis())
+    val allDayEventNames = listOf("National Holiday", "Conference", "Yoga Retreat", "All-Day Workshop", "Annual Festival")
+    val timedEventNames = listOf("Morning Jog", "Team Meeting", "Lunch Break", "Workout Session", "Evening Walk", "Dinner with Friends", "Networking Event")
+    val colors = listOf(
+        Color(0xFFFF6F61), Color(0xFF4CAF50), Color(0xFF64B5F6),
+        Color(0xFFFFEB3B), Color(0xFF673AB7), Color(0xFF957DAD),
+        Color(0xFFA1C349), Color(0xFFFFA07A)
+    )
+
+    var currentDate = startDate
+    while (!currentDate.isAfter(endDate)) {
+        // Generate 1 to 10 all-day events per day
+        val numberOfAllDayEvents = random.nextInt(1, 11)
+        for (i in 1..numberOfAllDayEvents) {
+            val allDayEvent = Event(
+                name = allDayEventNames[random.nextInt(allDayEventNames.size)],
+                color = colors[random.nextInt(colors.size)],
+                start = currentDate.withHour(0).withMinute(0).withSecond(0),
+                end = currentDate.withHour(23).withMinute(59).withSecond(59),
+                description = "A full-day event to mark the occasion.",
+                isAllDay = true
+            )
+            events.add(allDayEvent)
+        }
+
+        // Generate 1 to 9 additional timed events for the day
+        val numberOfTimedEvents = random.nextInt(1, 10)
+        for (i in 1..numberOfTimedEvents) {
+            val startHour = random.nextInt(0, 23)
+            val startMinute = random.nextInt(0, 60)
+            val durationHours = random.nextInt(1, 4)
+            val durationMinutes = random.nextInt(0, 60)
+            val endHour = (startHour + durationHours) % 24
+            val endMinute = (startMinute + durationMinutes) % 60
+
+            val startDateTime = currentDate.withHour(startHour).withMinute(startMinute)
+            val endDateTime = currentDate.withHour(endHour).withMinute(endMinute)
+
+            val timedEvent = Event(
+                name = timedEventNames[random.nextInt(timedEventNames.size)],
+                color = colors[random.nextInt(colors.size)],
+                start = startDateTime,
+                end = if (endDateTime.isAfter(startDateTime)) endDateTime else startDateTime.plusHours(1),
+                description = "A scheduled event to stay productive.",
+                isAllDay = false
+            )
+            events.add(timedEvent)
+        }
+
+        currentDate = currentDate.plusDays(1)
+    }
+
+    return events
+}
 
 class EventsProvider : PreviewParameterProvider<Event> {
     override val values = sampleEvents.asSequence()
