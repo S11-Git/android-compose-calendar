@@ -7,246 +7,277 @@ import kotlin.random.Random
 
 val sampleEvents = listOf(
     Event(
-        name = "New Year Celebration",
-        color = Color(0xFFDF2935),
-        start = LocalDateTime.parse("2025-01-01T00:00:00"),
-        end = LocalDateTime.parse("2025-01-01T23:59:59"),
-        description = "Celebrate the start of the New Year with family and friends.",
-        isAllDay = true
-    ),
-    Event(
-        name = "Morning Meditation",
-        color = Color(0xFF6A0572),
-        start = LocalDateTime.parse("2025-01-02T07:00:00"),
-        end = LocalDateTime.parse("2025-01-02T07:30:00"),
-        description = "Begin the day with a calming meditation session.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Grocery Shopping",
-        color = Color(0xFF9B5094),
-        start = LocalDateTime.parse("2025-01-02T17:00:00"),
-        end = LocalDateTime.parse("2025-01-02T18:00:00"),
-        description = "Stock up on weekly groceries.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Workout Session",
-        color = Color(0xFFECE3F0),
-        start = LocalDateTime.parse("2025-01-03T06:30:00"),
-        end = LocalDateTime.parse("2025-01-03T07:30:00"),
-        description = "Maintain fitness with a high-energy workout session.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Office Presentation",
-        color = Color(0xFF4A90E2),
-        start = LocalDateTime.parse("2025-01-03T10:00:00"),
-        end = LocalDateTime.parse("2025-01-03T12:00:00"),
-        description = "Present quarterly progress to the management team.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Family Dinner",
-        color = Color(0xFFFFA07A),
-        start = LocalDateTime.parse("2025-01-03T19:00:00"),
-        end = LocalDateTime.parse("2025-01-03T21:00:00"),
-        description = "Dinner with the family at home.",
+        name = "Board Game Night",
+        color = Color(0xFF4CAF50),
+        start = LocalDateTime.parse("2025-01-26T19:00:00"),
+        end = LocalDateTime.parse("2025-01-26T22:00:00"),
+        description = "Gather with friends for an evening of fun board games.",
         isAllDay = false
     ),
     Event(
         name = "Weekend Hike",
-        color = Color(0xFFA1C349),
-        start = LocalDateTime.parse("2025-01-04T08:00:00"),
-        end = LocalDateTime.parse("2025-01-04T12:00:00"),
-        description = "Explore nature with a refreshing weekend hike.",
+        color = Color(0xFF00BCD4),
+        start = LocalDateTime.parse("2025-01-27T09:00:00"),
+        end = LocalDateTime.parse("2025-01-27T15:00:00"),
+        description = "Explore the local trails and enjoy the fresh air.",
         isAllDay = false
     ),
     Event(
-        name = "Book Club Meeting",
-        color = Color(0xFFFFCC5C),
-        start = LocalDateTime.parse("2025-01-05T15:00:00"),
-        end = LocalDateTime.parse("2025-01-05T17:00:00"),
-        description = "Discuss the monthly book selection with the club.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Dentist Appointment",
-        color = Color(0xFFDC5C5C),
-        start = LocalDateTime.parse("2025-01-06T10:30:00"),
-        end = LocalDateTime.parse("2025-01-06T11:00:00"),
-        description = "Routine dental checkup and cleaning.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Mid-Month Review",
-        color = Color(0xFF8AC6D1),
-        start = LocalDateTime.parse("2025-01-15T14:00:00"),
-        end = LocalDateTime.parse("2025-01-15T16:00:00"),
-        description = "Review the progress of monthly goals and tasks.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Friend's Birthday Party",
-        color = Color(0xFFF4BFBF),
-        start = LocalDateTime.parse("2025-01-20T18:00:00"),
-        end = LocalDateTime.parse("2025-01-20T21:00:00"),
-        description = "Celebrate a friend's birthday at their place.",
-        isAllDay = false
-    ),
-    Event(
-        name = "New Year Celebration",
-        color = Color(0xFFDF2935),
-        start = LocalDateTime.parse("2025-01-01T00:00:00"),
-        end = LocalDateTime.parse("2025-01-01T23:59:59"),
-        description = "Celebrate the start of the New Year with family and friends.",
-        isAllDay = true
-    ),
-    Event(
-        name = "Morning Yoga",
-        color = Color(0xFF77AADD),
-        start = LocalDateTime.parse("2025-01-01T06:00:00"),
-        end = LocalDateTime.parse("2025-01-01T07:00:00"),
-        description = "Start the New Year with a relaxing yoga session.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Brunch with Family",
-        color = Color(0xFFAA6F73),
-        start = LocalDateTime.parse("2025-01-01T10:00:00"),
-        end = LocalDateTime.parse("2025-01-01T12:00:00"),
-        description = "Enjoy a cozy New Year’s brunch with family.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Afternoon Hike",
-        color = Color(0xFFA1C349),
-        start = LocalDateTime.parse("2025-01-01T14:00:00"),
-        end = LocalDateTime.parse("2025-01-01T16:30:00"),
-        description = "Kick off the year with an invigorating hike.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Evening Movie",
-        color = Color(0xFF957DAD),
-        start = LocalDateTime.parse("2025-01-01T20:00:00"),
-        end = LocalDateTime.parse("2025-01-01T22:30:00"),
-        description = "Watch a New Year blockbuster movie.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Work Deadline",
-        color = Color(0xFFFF6F61),
-        start = LocalDateTime.parse("2025-01-05T00:00:00"),
-        end = LocalDateTime.parse("2025-01-05T23:59:59"),
-        description = "Submit the end-of-week report.",
-        isAllDay = true
-    ),
-    Event(
-        name = "Coffee Meeting",
-        color = Color(0xFF6D4C41),
-        start = LocalDateTime.parse("2025-01-05T10:30:00"),
-        end = LocalDateTime.parse("2025-01-05T11:30:00"),
-        description = "Discuss collaboration opportunities over coffee.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Team Lunch",
-        color = Color(0xFFFFC107),
-        start = LocalDateTime.parse("2025-01-05T12:00:00"),
-        end = LocalDateTime.parse("2025-01-05T13:00:00"),
-        description = "Enjoy lunch with the team.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Presentation Prep",
-        color = Color(0xFF64B5F6),
-        start = LocalDateTime.parse("2025-01-05T14:00:00"),
-        end = LocalDateTime.parse("2025-01-05T16:00:00"),
-        description = "Prepare slides for next week's presentation.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Workout",
-        color = Color(0xFF4CAF50),
-        start = LocalDateTime.parse("2025-01-05T15:30:00"),
-        end = LocalDateTime.parse("2025-01-05T16:30:00"),
-        description = "Hit the gym for a strength-training session.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Friend's Wedding",
-        color = Color(0xFFE91E63),
-        start = LocalDateTime.parse("2025-01-10T14:00:00"),
-        end = LocalDateTime.parse("2025-01-10T20:00:00"),
-        description = "Celebrate a friend's special day.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Photography Workshop",
-        color = Color(0xFF9E9E9E),
-        start = LocalDateTime.parse("2025-01-10T09:00:00"),
-        end = LocalDateTime.parse("2025-01-10T16:00:00"),
-        description = "Learn advanced techniques in outdoor photography.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Morning Jog",
-        color = Color(0xFF2196F3),
-        start = LocalDateTime.parse("2025-01-15T06:00:00"),
-        end = LocalDateTime.parse("2025-01-15T07:00:00"),
-        description = "Stay active with a refreshing morning jog.",
-        isAllDay = false
-    ),
-    Event(
-        name = "Parent-Teacher Meeting",
+        name = "Movie Marathon",
         color = Color(0xFFFF9800),
-        start = LocalDateTime.parse("2025-01-15T09:00:00"),
-        end = LocalDateTime.parse("2025-01-15T10:30:00"),
-        description = "Discuss your child’s progress at school.",
+        start = LocalDateTime.parse("2025-01-28T14:00:00"),
+        end = LocalDateTime.parse("2025-01-28T20:00:00"),
+        description = "Watch a series of your favorite movies back-to-back.",
         isAllDay = false
     ),
     Event(
-        name = "Conference",
-        color = Color(0xFF673AB7),
-        start = LocalDateTime.parse("2025-01-20T09:00:00"),
-        end = LocalDateTime.parse("2025-01-20T23:59:59"),
-        description = "Attend a professional conference for networking and learning.",
+        name = "Grocery Shopping",
+        color = Color(0xFF9C27B0),
+        start = LocalDateTime.parse("2025-01-29T10:00:00"),
+        end = LocalDateTime.parse("2025-01-29T11:00:00"),
+        description = "Stock up on essentials for the week.",
         isAllDay = false
     ),
     Event(
-        name = "Lunch with Client",
-        color = Color(0xFFCDDC39),
-        start = LocalDateTime.parse("2025-01-20T12:30:00"),
-        end = LocalDateTime.parse("2025-01-20T13:30:00"),
-        description = "Discuss business opportunities over lunch.",
+        name = "Work Meeting",
+        color = Color(0xFF2196F3),
+        start = LocalDateTime.parse("2025-01-30T09:00:00"),
+        end = LocalDateTime.parse("2025-01-30T10:00:00"),
+        description = "Discuss project updates and upcoming tasks.",
         isAllDay = false
     ),
     Event(
-        name = "Networking Event",
-        color = Color(0xFF03A9F4),
-        start = LocalDateTime.parse("2025-01-20T18:00:00"),
-        end = LocalDateTime.parse("2025-01-20T20:00:00"),
-        description = "Connect with professionals in your industry.",
+        name = "Doctor's Appointment",
+        color = Color(0xFFE91E63),
+        start = LocalDateTime.parse("2025-01-31T11:00:00"),
+        end = LocalDateTime.parse("2025-01-31T11:30:00"),
+        description = "Regular check-up with the doctor.",
         isAllDay = false
     ),
     Event(
-        name = "Family Game Night",
+        name = "Valentine's Day Shopping",
+        color = Color(0xFFFF4081),
+        start = LocalDateTime.parse("2025-02-01T15:00:00"),
+        end = LocalDateTime.parse("2025-02-01T17:00:00"),
+        description = "Find the perfect gifts for loved ones.",
+        isAllDay = false
+    ),
+    Event(
+        name = "Weekend Getaway",
+        color = Color(0xFF009688),
+        start = LocalDateTime.parse("2025-02-01T00:00:00"),
+        end = LocalDateTime.parse("2025-02-02T23:59:59"),
+        description = "Escape for a relaxing weekend trip.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Birthday Party",
         color = Color(0xFFFFEB3B),
-        start = LocalDateTime.parse("2025-01-25T18:00:00"),
-        end = LocalDateTime.parse("2025-01-25T20:00:00"),
-        description = "Spend quality time with family over board games.",
+        start = LocalDateTime.parse("2025-02-02T16:00:00"),
+        end = LocalDateTime.parse("2025-02-02T20:00:00"),
+        description = "Celebrate a friend's birthday with cake and fun.",
         isAllDay = false
     ),
     Event(
-        name = "Monthly Planning",
-        color = Color(0xFF607D8B),
-        start = LocalDateTime.parse("2025-01-31T09:00:00"),
-        end = LocalDateTime.parse("2025-01-31T11:00:00"),
-        description = "Plan the goals and tasks for February.",
+        name = "Family Gathering",
+        color = Color(0xFF673AB7),
+        start = LocalDateTime.parse("2025-01-28T00:00:00"),
+        end = LocalDateTime.parse("2025-01-28T23:59:59"),
+        description = "Spend quality time with family.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Cleaning Day",
+        color = Color(0xFF8BC34A),
+        start = LocalDateTime.parse("2025-01-29T00:00:00"),
+        end = LocalDateTime.parse("2025-01-29T23:59:59"),
+        description = "Tidy up the house and get things organized.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Reading Time",
+        color = Color(0xFF3F51B5),
+        start = LocalDateTime.parse("2025-01-30T18:00:00"),
+        end = LocalDateTime.parse("2025-01-30T19:00:00"),
+        description = "Relax and enjoy a good book.",
+        isAllDay = false
+    ),
+    Event(
+        name = "Reading Time",
+        color = Color(0xFF3F51B5),
+        start = LocalDateTime.parse("2025-02-06T18:00:00"),
+        end = LocalDateTime.parse("2025-02-06T19:00:00"),
+        description = "Relax and enjoy a good book.",
+        isAllDay = false
+    ),
+    Event(
+        name = "Gym Workout",
+        color = Color(0xFFF44336),
+        start = LocalDateTime.parse("2025-01-31T07:00:00"),
+        end = LocalDateTime.parse("2025-01-31T08:00:00"),
+        description = "Stay active and maintain a healthy lifestyle.",
+        isAllDay = false
+    ),
+    Event(
+        name = "Coffee with Friends",
+        color = Color(0xFF795548),
+        start = LocalDateTime.parse("2025-02-02T11:00:00"),
+        end = LocalDateTime.parse("2025-02-02T12:00:00"),
+        description = "Catch up with friends over a cup of coffee.",
         isAllDay = false
     )
-
 )
 
 // Function to generate random events
