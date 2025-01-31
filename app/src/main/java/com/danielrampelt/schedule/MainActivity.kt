@@ -1,5 +1,3 @@
-@file:Suppress("NAME_SHADOWING")
-
 package com.danielrampelt.schedule
 
 import android.os.Bundle
@@ -657,20 +655,24 @@ fun Schedule(
     )
 
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage to pagerState.currentPageOffsetFraction }
-            .collect { (page, offset) ->
-                if (pagerState2.currentPage != page || pagerState2.currentPageOffsetFraction != offset) {
-                    pagerState2.scrollToPage(page, offset)
-                }
+        snapshotFlow {
+            pagerState.currentPage to pagerState.currentPageOffsetFraction
+        }
+        .collect { (page, offset) ->
+            if (pagerState2.currentPage != page || pagerState2.currentPageOffsetFraction != offset) {
+                pagerState2.scrollToPage(page, offset)
             }
+        }
     }
 
     LaunchedEffect(pagerState2) {
-        snapshotFlow { pagerState2.layoutInfo.visiblePagesInfo }
-            .collect { visiblePagesInfo ->
-                val visiblePageNumbers = visiblePagesInfo.map { it.index }
-                visiblePages = visiblePageNumbers
-            }
+        snapshotFlow {
+            pagerState2.layoutInfo.visiblePagesInfo
+        }
+        .collect { visiblePagesInfo ->
+            val visiblePageNumbers = visiblePagesInfo.map { it.index }
+            visiblePages = visiblePageNumbers
+        }
     }
 
 
@@ -720,7 +722,7 @@ fun Schedule(
                 )
 
                 HorizontalPager(state = pagerState2, pageSize = PageSize.Fixed(deviceWidth / 3 - 14.dp), userScrollEnabled = false, verticalAlignment = Alignment.Top) { page ->
-                    var date = currentDate.plusDays((page - initialPage).toLong())
+                    val date = currentDate.plusDays((page - initialPage).toLong())
 
                     ScheduleHeaderDaySection(
                         dayWidth = dayWidth,
