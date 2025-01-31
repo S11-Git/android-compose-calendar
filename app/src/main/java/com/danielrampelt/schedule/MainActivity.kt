@@ -668,8 +668,8 @@ fun Schedule(
     LaunchedEffect(pagerState2) {
         snapshotFlow {
             pagerState2.layoutInfo.visiblePagesInfo
-        }
-        .collect { visiblePagesInfo ->
+
+        }.collect { visiblePagesInfo ->
             val visiblePageNumbers = visiblePagesInfo.map { it.index }
             visiblePages = visiblePageNumbers
         }
