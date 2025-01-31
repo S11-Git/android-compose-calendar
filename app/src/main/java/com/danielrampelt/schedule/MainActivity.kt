@@ -720,7 +720,7 @@ fun Schedule(
                     menuHeight = menuHeight,
                 )
 
-                HorizontalPager(state = pagerState2, pageSize = PageSize.Fixed(deviceWidth / 8 ), userScrollEnabled = false, verticalAlignment = Alignment.Top) { page ->
+                HorizontalPager(state = pagerState2, pageSize = PageSize.Fixed(deviceWidth / 7- 6.dp), userScrollEnabled = false, verticalAlignment = Alignment.Top) { page ->
                     val date = currentDate.plusDays((page - initialPage).toLong())
 
                     ScheduleHeaderDaySection(
@@ -746,7 +746,7 @@ fun Schedule(
                     modifier = Modifier.verticalScroll(verticalScrollState)
                 )
 
-                HorizontalPager(state = pagerState, pageSize = PageSize.Fixed(deviceWidth / 8)) { page ->
+                HorizontalPager(state = pagerState, pageSize = PageSize.Fixed(deviceWidth / 7 - 6.dp)) { page ->
                     val date = currentDate.plusDays((page - initialPage).toLong())
                     val events = eventList.filter { !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) }
                     val nonAllDayEvents = events.filterNot(Event::isAllDay)
