@@ -648,7 +648,7 @@ fun Schedule(
         0 -> 0.dp
         1 -> 32.dp
         2 -> 64.dp
-        else -> 64.dp
+        else -> 72.dp
     }
     val animationDuration = 800 // Duration in milliseconds
     val menuHeight: Dp by animateDpAsState(
