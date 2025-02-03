@@ -6,10 +6,114 @@ import java.time.LocalDateTime
 
 val sampleEvents = listOf(
     Event(
-        name = "New Year Celebration",
+        name = "Allday test event",
         color = Color(0xFFDF2935),
-        start = LocalDateTime.parse("2025-01-01T00:00:00"),
-        end = LocalDateTime.parse("2025-01-01T23:59:59"),
+        start = LocalDateTime.parse("2025-02-03T00:00:00"),
+        end = LocalDateTime.parse("2025-02-03T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-03T00:00:00"),
+        end = LocalDateTime.parse("2025-02-03T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-03T00:00:00"),
+        end = LocalDateTime.parse("2025-02-03T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-03T00:00:00"),
+        end = LocalDateTime.parse("2025-02-03T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-03T00:00:00"),
+        end = LocalDateTime.parse("2025-02-03T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-03T00:00:00"),
+        end = LocalDateTime.parse("2025-02-03T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-01T00:00:00"),
+        end = LocalDateTime.parse("2025-02-01T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-01T00:00:00"),
+        end = LocalDateTime.parse("2025-02-01T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-01T00:00:00"),
+        end = LocalDateTime.parse("2025-02-01T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-01T00:00:00"),
+        end = LocalDateTime.parse("2025-02-01T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-01T00:00:00"),
+        end = LocalDateTime.parse("2025-02-01T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-01T00:00:00"),
+        end = LocalDateTime.parse("2025-02-01T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-01T00:00:00"),
+        end = LocalDateTime.parse("2025-02-01T23:59:59"),
+        description = "Celebrate the start of the New Year with family and friends.",
+        isAllDay = true
+    ),
+    Event(
+        name = "Allday test event",
+        color = Color(0xFFDF2935),
+        start = LocalDateTime.parse("2025-02-01T00:00:00"),
+        end = LocalDateTime.parse("2025-02-01T23:59:59"),
         description = "Celebrate the start of the New Year with family and friends.",
         isAllDay = true
     ),

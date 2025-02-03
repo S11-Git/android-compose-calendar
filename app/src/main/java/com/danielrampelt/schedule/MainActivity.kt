@@ -6,12 +6,12 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -19,7 +19,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -31,6 +30,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -51,6 +51,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -91,32 +92,32 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppCompatDelegate.MODE_NIGHT_NO
         setContent {
-            WeekScheduleTheme{
-                val deviceWidthDp = LocalConfiguration.current.screenWidthDp.dp
-                CompositionLocalProvider(
-                    LocalOverscrollConfiguration provides null
-                ) {
-                    Box {
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Schedule(
-                                eventList = sampleEvents,
-                                date = LocalDate.now(),
-                                numDays = 1,
-                                minTime = LocalTime.of(2, 0),
-                                maxTime = LocalTime.of(23, 59),
-                                daySize = ScheduleSize.Adaptive(
-                                    minSize = 0.dp
-                                ),
-                                modifier = Modifier.width(deviceWidthDp),
-                                verticalScrollState = rememberScrollState(),
-                            )
-                        }
+
+            val deviceWidthDp = LocalConfiguration.current.screenWidthDp.dp
+            CompositionLocalProvider(
+                LocalOverscrollConfiguration provides null
+            ) {
+                Box {
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Schedule(
+                            eventList = sampleEvents,
+                            numDays = 1,
+                            minTime = LocalTime.of(2, 0),
+                            maxTime = LocalTime.of(23, 59),
+                            daySize = ScheduleSize.Adaptive(
+                                minSize = 0.dp
+                            ),
+                            modifier = Modifier.width(deviceWidthDp),
+                            deviceWidth = deviceWidthDp
+                        )
                     }
                 }
             }
+
 //            WeekScheduleTheme {
 //                // A surface container using the 'background' color from the theme
 //                Surface(color = MaterialTheme.colors.background) {
@@ -308,120 +309,107 @@ fun BasicDayHeaderPreview(
 }
 
 
-fun getCurrentWeekNumber(
-    date: LocalDate,
-): Int {
-    val weekFields = WeekFields.of(Locale.getDefault())
-    return date.get(weekFields.weekOfWeekBasedYear())
+fun getCurrentWeekNumber(date: LocalDate): Int {
+    val systemLocale = Locale.getDefault(Locale.Category.FORMAT)
+    val weekFields = WeekFields.of(systemLocale)
+    val weekNumber = date.get(weekFields.weekOfWeekBasedYear())
+    return weekNumber
 }
 
 
 @Composable
-fun ScheduleHeader(
+fun ScheduleHeaderWeekSection(
+    date: LocalDate,
+    allDayEventsExceedThree: Boolean,
+    onClick: () -> Unit,
+    menuHeight: Dp,
+) {
+    var enabled by remember { mutableStateOf(false) }
+
+    val animationDuration = 800 // Duration in milliseconds
+    val rotation: Float by animateFloatAsState(
+        targetValue = if (enabled) 180f else 0f,
+        animationSpec = tween(durationMillis = animationDuration)
+    )
+    val weekNumber = getCurrentWeekNumber(date = date)
+    val weekNumberCount = weekNumber.toString().length
+    val FontSize = if (weekNumberCount > 1) 35.sp else 64.sp
+
+    Column(
+        horizontalAlignment = Alignment.End,
+        verticalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.width(43.dp).height(72.dp + menuHeight)
+    ) {
+        Text(
+            weekNumber.toString(),
+            fontSize = FontSize,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+        )
+        if (allDayEventsExceedThree) {
+            IconButton(onClick = {
+                onClick()
+                enabled = !enabled
+            }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = "Back",
+                    modifier = Modifier.rotate(rotation)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ScheduleHeaderDaySection(
     dayWidth: Dp,
     events: List<Event>,
     modifier: Modifier = Modifier,
     dayHeader: @Composable (date: LocalDate) -> Unit = { BasicDayHeader(date = it) },
     date: LocalDate,
-    ) {
+    menuHeight: Dp,
+) {
 
-    var enabled by remember { mutableStateOf(false) }
-
-    val allDayEvents by remember(events, date) {
-        mutableStateOf(events.filter { it.isAllDay && !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) })
-    }
-
-    val expandedHeight = (allDayEvents.size * 29).dp
-
-    val defaultHeight = when (allDayEvents.size) {
-        0 -> 0.dp
-        1 -> 32.dp
-        2 -> 64.dp
-        else -> 72.dp
-    }
-    val animationDuration = 800 // Duration in milliseconds
-    val menuHeight: Dp by animateDpAsState(
-        targetValue = if (enabled) expandedHeight else defaultHeight,
-        animationSpec = tween(durationMillis = animationDuration)
-    )
-    val rotation: Float by animateFloatAsState(
-        targetValue = if (enabled) 180f else 0f,
-        animationSpec = tween(durationMillis = animationDuration)
-    )
-
-    Column {
-        Row(
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.LightGray)
-                .height(IntrinsicSize.Max)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.padding(start = 8.dp, end = 0.dp).fillMaxHeight()
-            ) {
-                Text(
-                    getCurrentWeekNumber(date = date).toString(),
-                    fontSize = 55.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.CenterHorizontally).width(65.dp),
-                )
-                if (allDayEvents.size > 2) {
-                    IconButton(onClick = { enabled = !enabled }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowDropDown,
-                            contentDescription = "Back",
-                            modifier = Modifier.rotate(rotation)
-                        )
-                    }
+    Column(modifier = modifier.width(dayWidth), verticalArrangement = Arrangement.Top) {
+        // Day headers
+        Row(modifier = Modifier.fillMaxWidth()) {
+            val numDays = ChronoUnit.DAYS.between(date, date).toInt() + 1
+            repeat(numDays) { i ->
+                Box(modifier = Modifier.width(dayWidth)) {
+                    dayHeader(date.plusDays(i.toLong()))
                 }
             }
+        }
+        // All-day events bar
+        Row(modifier = Modifier.fillMaxWidth()) {
+            val numDays = ChronoUnit.DAYS.between(date, date).toInt() + 1
+            repeat(numDays) { i ->
+                date.plusDays(i.toLong())
+                val allDayEvents = events.filter { it.isAllDay && it.start.toLocalDate() == date }
 
-
-            Column(modifier = modifier) {
-                // Day headers
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    val numDays = ChronoUnit.DAYS.between(date, date).toInt() + 1
-                    repeat(numDays) { i ->
-                        Box(modifier = Modifier.width(dayWidth)) {
-                            dayHeader(date.plusDays(i.toLong()))
-                        }
-                    }
-                }
-                // All-day events bar
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    val numDays = ChronoUnit.DAYS.between(date, date).toInt() + 1
-                    repeat(numDays) { i ->
-                        date.plusDays(i.toLong())
-                        val allDayEvents = events.filter { it.isAllDay && it.start.toLocalDate() == date }
-
-                        Box(modifier = Modifier.width(dayWidth)) {
-                            Column(modifier = Modifier.height(menuHeight).padding(bottom = 4.dp)) {
-                                allDayEvents.forEach { event ->
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(2.dp)
-                                            .background(
-                                                event.color,
-                                                shape = RoundedCornerShape(4.dp)
-                                            )
-                                            .padding(4.dp)
-                                            .clickable { Log.d("Schedule", "Clicked on ${event.name}") }
-                                    ) {
-                                        Text(
-                                            text = event.name,
-                                            style = MaterialTheme.typography.caption,
-                                            color = Color.White,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
-                                }
+                Box(modifier = Modifier.width(dayWidth)) {
+                    Column(modifier = Modifier.height(menuHeight).padding(bottom = 4.dp)) {
+                        allDayEvents.forEach { event ->
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(2.dp)
+                                    .background(
+                                        event.color,
+                                        shape = RoundedCornerShape(4.dp)
+                                    )
+                                    .padding(4.dp)
+                                    .clickable { Log.d("Schedule", "Clicked on ${event.name}") },
+                            ) {
+                                Text(
+                                    text = event.name,
+                                    style = MaterialTheme.typography.caption,
+                                    color = Color.White,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
                         }
                     }
@@ -474,9 +462,10 @@ fun BasicSidebarLabelPreview() {
 @Composable
 fun ScheduleSidebar(
     hourHeight: Dp,
+    composableWidth: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    minTime: LocalTime = LocalTime.of(0,1),
-    maxTime: LocalTime = LocalTime.of(23,59),
+    minTime: LocalTime = LocalTime.of(0, 1),
+    maxTime: LocalTime = LocalTime.of(23, 59),
     label: @Composable (time: LocalTime) -> Unit = { BasicSidebarLabel(time = it) },
 ) {
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
@@ -485,7 +474,12 @@ fun ScheduleSidebar(
     val firstHourOffsetMinutes = if (firstHour == minTime) 0 else ChronoUnit.MINUTES.between(minTime, firstHour.plusHours(1))
     val firstHourOffset = hourHeight * (firstHourOffsetMinutes / 60f)
     val startTime = if (firstHour == minTime) firstHour else firstHour.plusHours(1)
-    Column(modifier = modifier) {
+
+    Column(
+        modifier = modifier.onGloballyPositioned { coordinates ->
+            composableWidth(coordinates.size.width)
+        }
+    ) {
         Spacer(modifier = Modifier.height(firstHourOffset))
         repeat(numHours) { i ->
             Box(modifier = Modifier.height(hourHeight)) {
@@ -494,18 +488,6 @@ fun ScheduleSidebar(
         }
     }
 }
-
-
-@Preview(showBackground = true)
-@Composable
-fun ScheduleSidebarPreview() {
-    WeekScheduleTheme {
-        ScheduleSidebar(
-            hourHeight = 64.dp,
-        )
-    }
-}
-
 
 private fun splitEvents(events: List<Event>): List<PositionedEvent> {
     return events
@@ -613,19 +595,15 @@ fun Schedule(
     dayHeader: @Composable (day: LocalDate) -> Unit = { BasicDayHeader(date = it) },
     timeLabel: @Composable (time: LocalTime) -> Unit = { BasicSidebarLabel(time = it) },
     numDays: Int = 1,
-    minTime: LocalTime = LocalTime.of(0,1),
-    maxTime: LocalTime = LocalTime.of(23,59),
+    minTime: LocalTime = LocalTime.of(0, 1),
+    maxTime: LocalTime = LocalTime.of(23, 59),
     daySize: ScheduleSize = ScheduleSize.FixedSize(256.dp),
     hourSize: ScheduleSize = ScheduleSize.FixedSize(64.dp),
-    date: LocalDate,
-    verticalScrollState: ScrollState,
+    deviceWidth: Dp = 300.dp
 ) {
     val numMinutes = ChronoUnit.MINUTES.between(minTime, maxTime).toInt() + 1
     val numHours = numMinutes.toFloat() / 60f
 
-
-
-//    val horizontalScrollState = rememberScrollState()
     var sidebarWidth by remember { mutableIntStateOf(0) }
     var headerHeight by remember { mutableIntStateOf(0) }
     val density = LocalDensity.current
@@ -639,12 +617,67 @@ fun Schedule(
         initialPage = initialPage,
         pageCount = { pageCount }
     )
+    val pagerState2 = rememberPagerState(
+        initialPage = initialPage,
+        pageCount = { pageCount }
+    )
+
+    var visiblePages by remember { mutableStateOf(emptyList<Int>()) }
+    var allDayEventsExceedThree by remember { mutableStateOf(false) }
+    var maxAllDayEventsSize by remember { mutableStateOf(0) }
+    var expanded by remember { mutableStateOf(false) }
+
+    val expandedHeight = (maxAllDayEventsSize * 29).dp
+
+    val defaultHeight = when (maxAllDayEventsSize) {
+        0 -> 0.dp
+        1 -> 32.dp
+        2 -> 64.dp
+        else -> 72.dp
+    }
+    val animationDuration = 800 // Duration in milliseconds
+    val menuHeight: Dp by animateDpAsState(
+        targetValue = if (expanded) expandedHeight else defaultHeight,
+        animationSpec = tween(durationMillis = animationDuration)
+    )
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow {
+            pagerState.currentPage to pagerState.currentPageOffsetFraction
+        }
+            .collect { (page, offset) ->
+                if (pagerState2.currentPage != page || pagerState2.currentPageOffsetFraction != offset) {
+                    pagerState2.scrollToPage(page, offset)
+                }
+            }
+    }
+
+    LaunchedEffect(pagerState2) {
+        snapshotFlow {
+            pagerState2.layoutInfo.visiblePagesInfo
+        }
+            .collect { visiblePagesInfo ->
+                val visiblePageNumbers = visiblePagesInfo.map { it.index }
+                visiblePages = visiblePageNumbers
+            }
+    }
+
+
+    LaunchedEffect(visiblePages) {
+        val dates = visiblePages.map { currentDate.plusDays((it - initialPage).toLong()) }
+        val allDayEventsList = dates.map { date ->
+            eventList.filter {
+                it.isAllDay && !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date)
+            }
+        }
+
+        allDayEventsExceedThree = allDayEventsList.any { it.size > 2 }
+        maxAllDayEventsSize = allDayEventsList.maxOfOrNull { it.size } ?: 0
+    }
+
+
 
     val verticalScrollState = rememberScrollState()
-
-    val deviceWidthDp = LocalConfiguration.current.screenWidthDp.dp
-
-
 
     BoxWithConstraints(
         modifier = modifier
@@ -660,38 +693,50 @@ fun Schedule(
             is ScheduleSize.Adaptive -> with(density) { maxOf(((constraints.maxHeight - headerHeight) / numHours).toDp(), hourSize.minSize) }
         }
 
-
-
-//        LaunchedEffect(Unit) {
-//            horizontalScrollState.scrollTo(0)
-//        }
-
         Column(modifier = modifier) {
-            ScheduleHeader(
-                dayWidth = dayWidth,
-                events = eventList,
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.Top,
                 modifier = Modifier
-//                    .horizontalScroll(horizontalScrollState)
-                    .onGloballyPositioned { headerHeight = it.size.height },
-                dayHeader = dayHeader,
-                date = currentDate.plusDays((pagerState.currentPage - initialPage).toLong()),
-            )
+                    .fillMaxWidth()
+                    .background(Color.LightGray)
+            ) {
+                ScheduleHeaderWeekSection(
+                    date = currentDate.plusDays((pagerState.currentPage - initialPage).toLong()),
+                    allDayEventsExceedThree = allDayEventsExceedThree,
+                    onClick = { expanded = !expanded },
+                    menuHeight = menuHeight,
+                )
+
+                HorizontalPager(state = pagerState2, pageSize = PageSize.Fill, userScrollEnabled = false, verticalAlignment = Alignment.Top) { page ->
+                    val date = currentDate.plusDays((page - initialPage).toLong())
+
+                    ScheduleHeaderDaySection(
+                        dayWidth = dayWidth,
+                        events = eventList,
+                        modifier = Modifier.onGloballyPositioned { headerHeight = it.size.height },
+                        dayHeader = dayHeader,
+                        date = date,
+                        menuHeight = menuHeight,
+                    )
+                }
+            }
 
             Row(modifier = Modifier
                 .weight(1f)
                 .align(Alignment.Start)) {
                 ScheduleSidebar(
                     hourHeight = hourHeight,
+                    composableWidth = { sidebarWidth = it },
                     minTime = minTime,
                     maxTime = maxTime,
                     label = timeLabel,
-                    modifier = Modifier
-                        .verticalScroll(verticalScrollState)
-                        .onGloballyPositioned { sidebarWidth = it.size.width }
+                    modifier = Modifier.verticalScroll(verticalScrollState)
                 )
-                HorizontalPager(state = pagerState) { page ->
+
+                HorizontalPager(state = pagerState, pageSize = PageSize.Fill) { page ->
                     val date = currentDate.plusDays((page - initialPage).toLong())
-                    var events = eventList.filter { !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) }
+                    val events = eventList.filter { !it.start.toLocalDate().isAfter(date) && !it.end.toLocalDate().isBefore(date) }
                     val nonAllDayEvents = events.filterNot(Event::isAllDay)
 
                     BasicSchedule(
@@ -705,12 +750,9 @@ fun Schedule(
                         modifier = Modifier
                             .weight(1f)
                             .verticalScroll(verticalScrollState)
-//                        .horizontalScroll(horizontalScrollState)
                             .padding(top = 16.dp),
-                        //                    horizontalScrollState = horizontalScrollState,
                     )
                 }
-
             }
         }
     }
