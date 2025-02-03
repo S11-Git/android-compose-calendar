@@ -310,11 +310,11 @@ fun BasicDayHeaderPreview(
 }
 
 
-fun getCurrentWeekNumber(
-    date: LocalDate,
-): Int {
-    val weekFields = WeekFields.of(Locale.getDefault())
-    return date.get(weekFields.weekOfWeekBasedYear())
+fun getCurrentWeekNumber(date: LocalDate): Int {
+    val systemLocale = Locale.getDefault(Locale.Category.FORMAT)
+    val weekFields = WeekFields.of(systemLocale)
+    val weekNumber = date.get(weekFields.weekOfWeekBasedYear())
+    return weekNumber
 }
 
 
