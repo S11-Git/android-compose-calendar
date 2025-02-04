@@ -269,6 +269,10 @@ fun BasicDayHeader(
 ) {
     val dayOfWeekFormatter = DateTimeFormatter.ofPattern("EEE", Locale.ENGLISH)
     val dayOfWeek = date.format(dayOfWeekFormatter).uppercase(Locale.ENGLISH)
+    val dateNow = LocalDate.now()
+    val colorBackground = if (dateNow == date) Color(255, 130, 0) else Color.Transparent
+    val colorTextDay = if (dateNow == date) Color(255, 130, 0) else Color.DarkGray
+    val colorTextDayNumber = if (dateNow == date) Color.White else Color.Black
 
     Column(
         modifier = modifier
@@ -278,19 +282,19 @@ fun BasicDayHeader(
     ) {
         Text(
             text = dayOfWeek,
-            color = Color(255, 130, 0)
+            color = colorTextDay,
         )
         Spacer(modifier = Modifier.height(2.dp))
         Surface(
             shape = CircleShape,
-            color = Color(255, 130, 0),
-            modifier = Modifier.size(30.dp)
+            color = colorBackground,
+            modifier = Modifier.size(28.dp)
         ) {
             Text(
                 text = date.dayOfMonth.toString(),
-                fontSize = 15.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = colorTextDayNumber,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 4.dp)
             )
