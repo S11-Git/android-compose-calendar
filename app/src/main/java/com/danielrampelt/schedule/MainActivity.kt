@@ -790,6 +790,7 @@ fun BasicSchedule(
 
     // State to trigger recomposition every minute
     var currentTime by remember { mutableStateOf(LocalTime.now()) }
+    val currentDate by remember { mutableStateOf(LocalDate.now()) }
 
     LaunchedEffect(Unit) {
         while (true) {
@@ -894,11 +895,16 @@ fun BasicSchedule(
                         end = Offset(size.width, currentTimeOffset),
                         strokeWidth = with(density) { 1.dp.toPx() }
                     )
-                    drawCircle(
-                        color = Color.Black,
-                        radius = with(density) { 4.dp.toPx() },
-                        center = Offset(with(density) { 4.dp.toPx() }, currentTimeOffset) // Adjusted offset
-                    )
+                    if (date == currentDate) {
+                        drawCircle(
+                            color = Color.Black,
+                            radius = with(density) { 4.dp.toPx() },
+                            center = Offset(
+                                with(density) { 4.dp.toPx() },
+                                currentTimeOffset
+                            )
+                        )
+                    }
                 }
             }
     ) { measureables, constraints ->
