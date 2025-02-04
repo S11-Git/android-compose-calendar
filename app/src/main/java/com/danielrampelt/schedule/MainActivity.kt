@@ -329,6 +329,7 @@ fun ScheduleHeaderWeekSection(
     allDayEventsExceedThree: Boolean,
     onClick: () -> Unit,
     menuHeight: Dp,
+    expanded: Boolean,
 ) {
     var enabled by remember { mutableStateOf(false) }
 
@@ -340,6 +341,12 @@ fun ScheduleHeaderWeekSection(
     val weekNumber = getCurrentWeekNumber(date = date)
     val weekNumberCount = weekNumber.toString().length
     val FontSize = if (weekNumberCount > 1) 35.sp else 64.sp
+
+    LaunchedEffect(expanded) {
+        if (!expanded) {
+            enabled = false
+        }
+    }
 
     Column(
         horizontalAlignment = Alignment.End,
@@ -681,7 +688,12 @@ fun Schedule(
         maxAllDayEventsSize = allDayEventsList.maxOfOrNull { it.size } ?: 0
     }
 
+    LaunchedEffect(allDayEventsExceedThree) {
+        if (!allDayEventsExceedThree && expanded) {
+            expanded = false
 
+        }
+    }
 
     val verticalScrollState = rememberScrollState()
 
@@ -712,6 +724,7 @@ fun Schedule(
                     allDayEventsExceedThree = allDayEventsExceedThree,
                     onClick = { expanded = !expanded },
                     menuHeight = menuHeight,
+                    expanded = expanded
                 )
 
                 HorizontalPager(state = pagerState2, pageSize = PageSize.Fill, userScrollEnabled = false, verticalAlignment = Alignment.Top) { page ->
@@ -794,7 +807,7 @@ fun BasicSchedule(
 
     LaunchedEffect(Unit) {
         while (true) {
-            delay(15000) // refresh clock every 15 seconds
+            delay(15000)
             currentTime = LocalTime.now()
         }
     }
