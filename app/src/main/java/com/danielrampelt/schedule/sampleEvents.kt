@@ -546,7 +546,7 @@ val sampleEvents = listOf(
         name = "Weekend Project - Home Improvement",
         color = Color(0xFF795548),
         start = LocalDateTime.parse("2025-02-22T09:00:00"),
-        end = LocalDateTime.parse("2025-02-23T18:00:00"),
+        end = LocalDateTime.parse("2025-02-22T18:00:00"),
         description = "Work on a home improvement project throughout the weekend.",
         isAllDay = true
     ),
@@ -554,7 +554,7 @@ val sampleEvents = listOf(
         name = "Relaxation Weekend",
         color = Color(0xFFF5F5F5),
         start = LocalDateTime.parse("2025-02-22T00:00:00"), //added extra all day event
-        end = LocalDateTime.parse("2025-02-23T23:59:59"), //added extra all day event
+        end = LocalDateTime.parse("2025-02-22T23:59:59"), //added extra all day event
         description = "Focus on relaxation and unwinding this weekend.", //added extra all day event
         isAllDay = true //added extra all day event
     ),
