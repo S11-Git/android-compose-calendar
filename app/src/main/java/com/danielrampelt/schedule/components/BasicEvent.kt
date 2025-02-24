@@ -25,7 +25,6 @@ import java.time.format.DateTimeFormatter
 
 private val EventTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-
 @Composable
 fun BasicEvent(
     positionedEvent: PositionedEvent,
