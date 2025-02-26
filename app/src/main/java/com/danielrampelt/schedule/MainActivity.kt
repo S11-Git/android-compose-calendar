@@ -1,5 +1,9 @@
 package com.danielrampelt.schedule
 
+//noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
+//noinspection UsingMaterialAndMaterial3Libraries
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -27,13 +31,10 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-//noinspection UsingMaterialAndMaterial3Libraries
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Scaffold
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Tab
-//noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.PrimaryTabRow
@@ -87,6 +88,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.MODE_NIGHT_NO
         setContent {
+            val list = remember { mutableStateOf(sampleEvents) }
+//            programmableEvents = sampleEvents.toMutableList()
             val deviceWidthDp = LocalConfiguration.current.screenWidthDp.dp
             CompositionLocalProvider(
                 LocalOverscrollConfiguration provides null
@@ -94,6 +97,16 @@ class MainActivity : ComponentActivity() {
                 var days by remember { mutableIntStateOf(7) }
 
                 Scaffold(
+                    floatingActionButton = {
+                        Button(onClick = {
+                            val currentDate = LocalDateTime.now()
+                            val endDate = currentDate.plusDays(7)
+                            val startDate = currentDate.plusDays(- 7)
+                            generateRandomEvents(startDate, endDate)
+                        }) {
+                            Text("Random")
+                        }
+                    },
                     bottomBar = {
                         var state by remember { mutableIntStateOf(2) }
                         val titles = listOf("Day", "3 Days", "Week")
@@ -122,7 +135,7 @@ class MainActivity : ComponentActivity() {
                             verticalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Schedule(
-                                eventList = sampleEvents,
+                                eventList = list.value,
                                 numDays = days,
                                 minTime = LocalTime.of(2, 0),
                                 maxTime = LocalTime.of(22, 0),

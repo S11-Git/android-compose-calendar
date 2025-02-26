@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -13,14 +12,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import com.danielrampelt.schedule.Event
-import com.danielrampelt.schedule.EventsProvider
 import com.danielrampelt.schedule.PositionedEvent
 import com.danielrampelt.schedule.SplitType
-import com.danielrampelt.schedule.ui.theme.WeekScheduleTheme
 import java.time.format.DateTimeFormatter
 
 private val EventTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
@@ -55,7 +49,7 @@ fun BasicEvent(
         Text(
             text = "${event.start.format(EventTimeFormatter)} - ${event.end.format(EventTimeFormatter)}",
             style = MaterialTheme.typography.caption,
-            maxLines = 1,
+//            maxLines = 1,
             overflow = TextOverflow.Clip,
         )
 
@@ -63,7 +57,7 @@ fun BasicEvent(
             text = event.name,
             style = MaterialTheme.typography.body1,
             fontWeight = FontWeight.Bold,
-            maxLines = 1,
+//            maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
 
@@ -71,22 +65,22 @@ fun BasicEvent(
             Text(
                 text = event.description,
                 style = MaterialTheme.typography.body2,
-                maxLines = 1,
+//                maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun EventPreview(
-    @PreviewParameter(EventsProvider::class) event: Event,
-) {
-    WeekScheduleTheme {
-        BasicEvent(
-            PositionedEvent(event, SplitType.None, event.start.toLocalDate(), event.start.toLocalTime(), event.end.toLocalTime()),
-            modifier = Modifier.sizeIn(maxHeight = 64.dp)
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun EventPreview(
+//    @PreviewParameter(EventsProvider::class) event: Event,
+//) {
+//    WeekScheduleTheme {
+//        BasicEvent(
+//            PositionedEvent(event, SplitType.None, event.start.toLocalDate(), event.start.toLocalTime(), event.end.toLocalTime()),
+//            modifier = Modifier.sizeIn(maxHeight = 64.dp)
+//        )
+//    }
+//}
